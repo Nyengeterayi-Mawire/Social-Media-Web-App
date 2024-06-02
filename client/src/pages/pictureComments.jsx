@@ -7,7 +7,7 @@ import { useLocation } from 'react-router-dom';
     const {user,post} = location.state 
     
     return(
-        <div className="pictureComments" style={{width:'70%',margin:'auto auto',borderRight:'1px solid grey',borderLeft:'1px solid grey'}} >  
+        <div className="pictureComments" style={{width:'70%',margin:'auto auto',borderRight:'1px solid rgb(58,59,60)',borderLeft:'1px solid rgb(58,59,60)'}} >  
             <Navbar user={user}/> 
             <Singlepicture post={post} />
             

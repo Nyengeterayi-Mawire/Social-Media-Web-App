@@ -31,7 +31,7 @@ const Profile = () => {
     // console.log('user info', user)
     console.log('postList info', postList)
     return(
-        <div className="profile" style={{width:'70%',margin:'auto auto',borderRight:'1px solid grey',borderLeft:'1px solid grey'}}>
+        <div className="profile" style={{width:'70%',margin:'auto auto',borderRight:'1px solid rgb(58,59,60)',borderLeft:'1px solid rgb(58,59,60)'}}>
             {/* <NavbarUpdate user={user}/> */}
             <Navbar user={user}/>
             <ProfileComp user={user} postList={postList}/>

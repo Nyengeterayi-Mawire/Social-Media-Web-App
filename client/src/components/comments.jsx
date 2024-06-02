@@ -1,21 +1,28 @@
 import { useState,useEffect } from "react"; 
 import { useSelector } from "react-redux";
-import axios from 'axios';
+import axios from 'axios'; 
+import toast from "react-hot-toast";
 
-const Comments = ({postID,userID}) => { 
+const Comments = ({postID,post,userID}) => { 
     // console.log('comments',comments) 
     const token = useSelector(state=>state.user.value.token) 
+    const socket = useSelector(state => state.user.value.socket);
+    const onlineUsers = useSelector(state => state.messages.value.online);
+    const user = useSelector(state=>state.user.value.user);  
+    
 
     const [commentText,setCommentText] = useState(''); 
     const [newComment,setNewComment]= useState({})
     const [commentsList, setCommentsList] = useState([]);  
     const [userList,setUserList] = useState([]);
     const [wait,setWait] = useState(true);
+    const [isLoading,setIsLoading] = useState(true);
     
     useEffect (()=>{
         axios.get('/comment/'+postID,{headers:{'Authorization': token}}).then(res=>{
             setCommentsList(res.data)
-            setWait(false)
+            setWait(false) 
+            
         } )  
         
        
@@ -25,7 +32,10 @@ const Comments = ({postID,userID}) => {
     },[postID]) 
 
     useEffect(()=>{
-        Promise.all(commentsList.map(comment=>axios.get('/register/'+comment.userID,{headers:{'Authorization': token}}))).then(res=>setUserList(res));
+        Promise.all(commentsList.map(comment=>axios.get('/register/'+comment.userID,{headers:{'Authorization': token}}))).then(res=>{
+            setUserList(res)
+            setIsLoading(false)});
+        
     },[wait]) 
 
     useEffect(()=>{ 
@@ -53,6 +63,7 @@ const Comments = ({postID,userID}) => {
                 console.log('there was error',res.data.err)
             }else{
                 setNewComment(res.data)
+                socket.emit('commentNotification',{userID:user._id ,username:user.username,userLiked:onlineUsers.filter( onlineUser => onlineUser.userID === post.userID)[0] })
             }
         })
     } 
@@ -62,6 +73,10 @@ const Comments = ({postID,userID}) => {
         axios.delete('/comment/delete/'+commentID,{headers:{'Authorization':token}},{postID},).then(res=>{
            
             console.log('comment delete err',res.data) 
+            toast.success('Deleted comment',{style:{
+                backgroundColor:'rgb(58,59,60)',
+                color:'#fff',             
+              }})
             // const newList = commentsList.filter(comment=>comment._id !== commentID) 
             setCommentsList(commentsList.filter(comment=>comment._id !== commentID))
             
@@ -79,7 +94,7 @@ const Comments = ({postID,userID}) => {
                 <button onClick={handleCommentSubmit}>send</button>
             </div> 
             <div style={{maxHeight:'80%',overflowX:'scroll',scrollbarWidth:'none'}}>
-            {commentsList && commentsList.map((comment) => { 
+            {commentsList && !isLoading ? commentsList.map((comment) => { 
                 
                 const user = userList.filter(user=>user.data._id === comment.userID)[0]
                 console.log('user ', user)
@@ -94,7 +109,20 @@ const Comments = ({postID,userID}) => {
                         {userID === comment.userID && <button className="commentDeleteButton" onClick={()=>handleComentDelete(comment._id)} style={{backgroundColor:'transparent',width:'30px',height:'30px',justifyContent:'center',alignItems:'center',borderRadius:'50%',border:'none',color:'grey'}}><i  className="fa-regular fa-trash-can" style={{margin:'auto'}}></i></button>}
                     </div>
                 </div>
-            })} 
+            }):<div style={{height:'inherit',display:'flex',justifyContent:'center',position:'relative'}}>
+            <div class="spinner" >
+                    <div></div>   
+                    <div></div>    
+                    <div></div>    
+                    <div></div>    
+                    <div></div>    
+                    <div></div>    
+                    <div></div>    
+                    <div></div>    
+                    <div></div>    
+                    <div></div>    
+                </div>
+            </div>} 
             </div>
         </div>
     )

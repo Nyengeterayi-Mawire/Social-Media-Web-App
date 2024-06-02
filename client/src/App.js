@@ -19,20 +19,23 @@ import toast from 'react-hot-toast'
 import Settings from './pages/settings';
 import Picturecomments from './pages/pictureComments'; 
 import { addMessage, addOnline,removeOnline } from './features/meassages'; 
-import { addComment,addPost } from './features/userSlice';
+import { addComment,addPost,addContact } from './features/userSlice';
 
 // const socket = io.connect('http://localhost:3001',{autoConnect : false});
 // console.log(socket);
 
 function App() {  
   const user = useSelector((state)=>state.user.value.logged) 
+  const userLoggedIn = useSelector((state)=> state.user.value.user)
   const socket = useSelector((state)=>state.user.value.socket)
   const dispatch = useDispatch();
   console.log('logged',user); 
 
   // const [form,setForm] = useState({photo:''}) 
   // const [image,setImage] = useState(null); 
-  // const id = '663243a5f6f407926bd63331' 
+  // const id = '663243a5f6f407926bd63331'  
+
+  console.log('userLOggedIn--- App.js',userLoggedIn)
 
   useEffect(()=>{
         if(socket){
@@ -44,17 +47,29 @@ function App() {
             dispatch(removeOnline(userID))
           })
           socket.on('likeNotification',data=>{
-            toast.success(`${data.userLiked.username} liked your photo`)
+            toast.success(`${data.username} liked your photo`,{style:{
+              backgroundColor:'rgb(58,59,60)',
+              color:'#fff',             
+            }})
           }) 
           socket.on('commentNotification',data=>{
-            toast.success(`${data.userLiked.username} commented on your photo`) 
-        
+            toast.success(`${data.username} commented on your photo`,{style:{
+              backgroundColor:'rgb(58,59,60)',
+              color:'#fff',             
+            }})         
           });  
-          socket.on('addPost',data=>{
-            dispatch(addPost(data))
-          })
-          socket.on('sendMessage',data=>{
-            toast(`New message from : ${data.details.userName}`)
+          // socket.on('addPost',data=>{
+          //   dispatch(addPost(data))
+          // })
+          socket.on('sendMessage',data=>{ 
+            if (userLoggedIn.messaging.filter(contactID => contactID === data.details.senderID).length === 0){
+              dispatch(addContact(data.details.senderID))
+            } 
+            console.log('inside send message socket', userLoggedIn)
+            toast(`New message from : ${data.details.userName}`,{style:{
+              backgroundColor:'rgb(58,59,60)',
+              color:'#fff',             
+            }})
           })
         }
         
@@ -92,7 +107,7 @@ function App() {
     <div className="App">   
     
     <Router>  
-      <Toaster/>
+      <Toaster position='bottom-center'/>
       
       <TopNavbar socket={socket}/> 
       

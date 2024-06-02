@@ -51,15 +51,12 @@ const TopNavbar = ({socket}) => {
             <div style={{width:'15em', position : 'absolute',top:'12px' }}>
                 <div>
                 <button onClick={searchShow}><i class="fa-solid fa-magnifying-glass"></i></button>
-                <input type='text' onClick={searchButtonClick} onChange={searchInput} placeholder="Search" style={display?{display:'initial',width:'12em'}:{display:'none'}}></input> 
+                <input className="inputButton" type='text' onClick={searchButtonClick} onChange={searchInput} placeholder="Search" style={display?{display:'initial',width:'12em',height:'25px',border:'1px solid grey',backgroundColor:'transparent',borderRadius:'20px',paddingLeft:'10px',color:'rgb(176,179,184)'}:{display:'none'}}></input> 
                 </div>
-                <div style={display?{height:'90vh',paddingTop:'20px',overflowY:'scroll',scrollbarWidth:'none'}:{display:'none'}}>
-                    {/* {searchList&&searchList.filter((user)=>{
-                        return user.username === searchValue;
-                    })} */} 
+                <div style={display?{height:'90vh',paddingTop:'15px',overflowY:'scroll',scrollbarWidth:'none'}:{display:'none'}}>
 
                     {searchListDisplay&&searchListDisplay.map((user)=>{
-                        return <Link className="Link" to='/profile' state={user._id} onClick={closeSearchBar} ><div className=' searchUser' style={{display:'flex',margin:'10px 0px 0px 0px',border:'1px solid rgb(58,59,60)',padding:'5px', borderRadius:'25px'}}> 
+                        return <Link className="Link" to='/profile' state={user._id} onClick={closeSearchBar} ><div className=' searchUser' style={{display:'flex',margin:'10px 0px 0px 10px',border:'1px solid rgb(58,59,60)',padding:'5px', borderRadius:'25px'}}> 
                             {user.photo ? <img src={user.photo} style={{width:'50px',height:'50px',borderRadius:'50%',marginLeft:'5px'}}/>:<div style={{width:'50px',height:'50px',borderRadius:'50%',backgroundColor:'grey',marginLeft:'5px'}}/>}
                             <p style={{marginLeft:'10px'}}>{user.username}</p>
                         </div></Link>
@@ -78,7 +75,7 @@ const TopNavbar = ({socket}) => {
                 <button onClick={()=>navigate('/settings')}><i class="fa-solid fa-gear"></i></button> 
 
                 </div> 
-                {/* <Link to='/profile' state={user._id}><i class="fa-solid fa-user"></i></Link> */}
+                <Link to='/profile' state={user._id} style={{marginLeft:'20px'}} ><i class="fa-solid fa-user"></i></Link>
                 <button onClick={()=>{ 
                      dispatch(logout()); 
                      dispatch(hide())

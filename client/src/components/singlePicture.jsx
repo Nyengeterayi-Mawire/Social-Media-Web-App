@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { combineSlices } from "@reduxjs/toolkit";
 import axios from "axios";
+import toast from "react-hot-toast";
 const Singlepicture = ({post}) => { 
     // console.log('picture to display',post)  
     const userLoggedIn = useSelector(state=>state.user.value.user) 
@@ -15,7 +16,11 @@ const Singlepicture = ({post}) => {
             if(res.data.err){
                 console.log('coukd not delete post',res.data.err)
             }else{
-                console.log('successfully deleted post')
+                console.log('successfully deleted post') 
+                toast.success('Deleted picture',{style:{
+                    backgroundColor:'rgb(58,59,60)',
+                    color:'#fff',             
+                  }})
             }
         })
     }
@@ -34,7 +39,7 @@ const Singlepicture = ({post}) => {
                         </div>
                 </div>
             </div>
-            <Comments postID={post._id} userID={userLoggedIn._id}/>
+            <Comments postID={post._id} post={post} userID={userLoggedIn._id}/>
         </div>
     )
 } 

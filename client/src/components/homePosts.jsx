@@ -9,6 +9,7 @@ const HomePosts = ({user,postsList}) => {
     const [commentButton,setCommentButton] = useState(false);  
     const [commentText,setCommentText] = useState('') ; 
     const [userList,setUserList] = useState([]); 
+    const [loading,setLoading] = useState(true);
     const socket = useSelector(state => state.user.value.socket);
     const onlineUsers = useSelector(state => state.messages.value.online); 
     const token = useSelector(state=>state.user.value.token)
@@ -17,14 +18,18 @@ const HomePosts = ({user,postsList}) => {
     const [userCommentingData,setUseCommentingData] = useState({userID:`${user._id}`,username:user.username, photo: user.photo,comment:''})
 
     useEffect(()=>{
-        Promise.all(postsList.map(post=>axios.get('/register/'+post.userID,{headers:{'Authorization': token}}))).then(data=>setUserList(data))
+        Promise.all(postsList.map(post=>axios.get('/register/'+post.userID,{headers:{'Authorization': token}}))).then(data=>{
+            setUserList(data)
+            setLoading(false)
+            console.log('ended',data)})
+            
     },[postsList])
 
    
     const handleLikeButtonClick =(post,index)=> {
         axios.patch('/post/addLike/'+post._id,user,{headers:{'Authorization': token}}).then(res=>console.log(res));  
         if( onlineUsers.filter(onlineUser => onlineUser.userID === post.userID ).length !== 0){
-            socket.emit('likeNotification',{userID:user._id ,userLiked:onlineUsers.filter( onlineUser => onlineUser.userID === post.userID)[0] }) 
+            socket.emit('likeNotification',{userID:user._id,username:user.username ,userLiked:onlineUsers.filter( onlineUser => onlineUser.userID === post.userID)[0] }) 
         } 
         
         dispatch(addLike({id:user._id,index}));
@@ -36,7 +41,7 @@ const HomePosts = ({user,postsList}) => {
             console.log('comment',{postID:post._id,userID:user._id,text:commentText});
             axios.post('/comment/add/'+post._id,{headers:{'Authorization': token}},{postID:post._id,userID:user._id,text:commentText}); 
             if( onlineUsers.filter(onlineUser => onlineUser.userID === post.userID)){
-                socket.emit('commentNotification',{userID:user._id ,userLiked:onlineUsers.filter( onlineUser => onlineUser.userID === post.userID)[0] }) 
+                socket.emit('commentNotification',{userID:user._id ,username:user.username,userLiked:onlineUsers.filter( onlineUser => onlineUser.userID === post.userID)[0] }) 
             } 
             setCommentText('');
 
@@ -46,17 +51,14 @@ const HomePosts = ({user,postsList}) => {
     console.log('posts',postsList)
     return(
         <div className="homePosts" style={{overflowY:'scroll', overflowStyle: 'none', scrollbarWidth:'none'}}> 
-        {postsList && userList && postsList.map((post,index)=>{  
-            // let postUserInfo = null 
-            // if(userList){
-            //     postUserInfo = userList.filter(user=>user._id===post.userID)[0] 
-            // }
-            
-            // console.log('postuserinfo',postUserInfo) 
+        {postsList && !loading && userList.length !== 0 ? postsList.map((post,index)=>{  
+                             
+            const postUser = userList.filter(user=>user.data._id === post.userID)[0]
             const vid = post.media[0].mimetype.indexOf('video')
+            
             return <div className="postWidget" style={{marginTop:'20px'}}>
             <div className="postWidgetUserSection" style={{display:'flex',height:'fit-content',padding:'5px 0px 5px 15px',alignItems:'center'}}> 
-                {post.userProfile ? <img src={post.userProfile} alt='profile' style={{width:'40px' ,height:'40px',borderRadius:'50%'}}/>:<div style={{width:'40px' ,height:'40px',borderRadius:'50%',backgroundColor:'grey'}}></div>}
+                 {postUser.data.photo ? <img src={postUser.data.photo} alt='profile' style={{width:'40px' ,height:'40px',borderRadius:'50%'}}/>:<div style={{width:'40px' ,height:'40px',borderRadius:'50%',backgroundColor:'grey'}}></div>}
                 <Link className="Link" to='/profile' state={post.userID}><p style={{marginLeft:'10px'}}>{post.userUsername}</p></Link>
             </div> 
             <div className="postWidgetImageSection" style={{paddingBottom:'10px'}}> 
@@ -79,7 +81,20 @@ const HomePosts = ({user,postsList}) => {
                 
             </div>
         </div>
-        })}
+        }): <div style={{height:'inherit',display:'flex',justifyContent:'center',position:'relative'}}>
+                <div class="spinner" >
+                    <div></div>   
+                    <div></div>    
+                    <div></div>    
+                    <div></div>    
+                    <div></div>    
+                    <div></div>    
+                    <div></div>    
+                    <div></div>    
+                    <div></div>    
+                    <div></div>    
+                </div>
+            </div>}
             
         </div>
     )

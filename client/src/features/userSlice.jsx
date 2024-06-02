@@ -94,7 +94,7 @@ export const userSlice = createSlice({
             state.value.posts = [action.payload,...state.value.posts]
         }, 
         addContact : (state,action) => {
-            state.value.user.messaging.push(action.payload)
+            state.value.user.messaging = [action.payload,...state.value.user.messaging]
         }
 
     }

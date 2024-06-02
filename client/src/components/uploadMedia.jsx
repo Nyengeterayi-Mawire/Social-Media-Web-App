@@ -56,12 +56,16 @@ const UploadMedia =()=> {
         console.log('err',res.data.err)
         setError(res.data.err)
         }else{
-          toast('Successfully posted picture') ;
+          toast.success('Successfully posted picture',{style:{
+            backgroundColor:'rgb(58,59,60)',
+            color:'#fff',             
+          }}) ;
           setUrl('');
-          socket.emit('addPost',form)
+          socket.emit('addPost',res.data);
+          console.log('this is the uploaded picture',res.data)
         }})
       .catch(err=>console.log(err)); 
-    socket.emit('addPost',form)
+    
   } 
   // console.log('keys in object',Object.keys(image))
     return(
@@ -88,14 +92,6 @@ const UploadMedia =()=> {
           </form>  
           </div>
 
-      {/* <Register/> */} 
-      {/* <Login/> */}
-
-      {/* {image && <img src={`http://localhost:3001/${image.media[0].filename}`} alt=''></img>} */}
-      {/* {image && image.media.map((set)=>{
-        
-        return <img src={`http://localhost:3001/${set.filename}`} alt='image' style={{width:'25%',height:'25%'}}></img>
-      })} */}
         </div>
     )
 }

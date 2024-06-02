@@ -1,6 +1,7 @@
 import { useSelector,useDispatch } from "react-redux";
 import { useState,useEffect } from "react";  
-import { addMessage,setMessageList,deleteMessage } from "../features/meassages"; 
+import { addMessage,setMessageList,deleteMessage } from "../features/meassages";  
+import sendIcon from '../Send.png';
 import axios from 'axios'
 
 
@@ -13,7 +14,8 @@ const MessagesLists = ({user,socket,contactInfo,viewMessages,onlineUsers}) => {
     const [conversationID,setConversationID] =useState('0');
     const [profilePic,setProfilePic] = useState('');  
     const [username,setUsername] = useState(''); 
-    const [contact,setContact] = useState({data:{id:'0'}}); 
+    const [contact,setContact] = useState({data:{id:'0'}});  
+    const [isLodaing,setIsLoading] = useState(true);
     const dispatch = useDispatch(); 
 
     useEffect(()=>{
@@ -32,7 +34,9 @@ const MessagesLists = ({user,socket,contactInfo,viewMessages,onlineUsers}) => {
                 if(Object.keys(res.data).length !== 0){
                     setConversationID(res.data._id)
                     console.log('message convo id',res.data)
-                    axios.get('/message/'+res.data._id,{headers:{'Authorization': token}}).then(response=>dispatch(setMessageList(response.data)))
+                    axios.get('/message/'+res.data._id,{headers:{'Authorization': token}}).then(response=>{
+                        dispatch(setMessageList(response.data))
+                        setIsLoading(false)})
                     // console.log('run this')
                 }
                 
@@ -74,16 +78,8 @@ const MessagesLists = ({user,socket,contactInfo,viewMessages,onlineUsers}) => {
             time : new Date().getHours() + ":" + new Date().getMinutes()
         },{headers:{'Authorization': token}}).then(res=>console.log('message sent',res.data))
 
-        // socket.emit('privateMessage',{
-        //     message :messageText,
-        //     userName : user.username, 
-        //     socketID : contactInfo.socket.socketID,
-        //     date : new Date(),
-        //     time : new Date().getHours() + ":" + new Date().getMinutes()
-    
-        // })
-        if(contactInfo.socket){
-            socket.emit('sendMessage',{sendTo : contactInfo.socket, details:{
+        if(onlineUsers.filter(onlineUser=>onlineUser.userID === contactInfo.contact.data._id).length !== 0){
+            socket.emit('sendMessage',{sendTo : onlineUsers.filter(onlineUser=>onlineUser.userID === contactInfo.contact.data._id)[0], details:{
                 message :messageText,
                 userName : user.username,
                 senderID : user._id,  
@@ -127,13 +123,9 @@ const MessagesLists = ({user,socket,contactInfo,viewMessages,onlineUsers}) => {
                 <h3 style={{marginLeft:'10px'}}>{username}</h3>
             </div>
             <div style={{borderTop:'1px solid grey',height:'80%',overflowY:'scroll',scrollbarWidth:'none' }}>
-                   {messages.length !== 0 ? messages.map((message,index)=> {
+                   {!isLodaing ? messages.length !== 0 ? messages.map((message,index)=> {
                         return  user._id !== message.senderID?<div style={{display:'flex',padding:'0px 0px',width:'fit-content',position:'relative',alignItems:'flex-start',margin:'10px 30px 10px 10px'}}>
-                            {/* <img style={{width:'40px',height:'40px',borderRadius:'50%'}}/>  */} 
-                            {/* <div style={{height:'fit-content'}}>
-                                <div style={{width:'40px',height:'40px',borderRadius:'50%',backgroundColor:'grey'}}></div>
-                            </div> */}
-                            <div style={{padding:'10px',display:'flex',flexDirection:'column', maxWidth:'350px',border:'1px solid blue',borderRadius:'0px 10px 10px 10px',height:'fit-content',margin:'0px 5px 10px 25px'}}>
+                            <div style={{padding:'10px',display:'flex',flexDirection:'column', maxWidth:'350px',backgroundColor:'#343a40',borderRadius:'0px 10px 10px 10px',height:'fit-content',margin:'0px 5px 10px 25px'}}>
                                 <p style={{ width:'100%',margin:'0px 0px 5px 0px'}}>{message.userName}</p> 
                                 <p style={{width:'100%',margin:'0px',height:'fit-content',maxWidth:'350px', display:'flex',flexWrap:'wrap'}}>{message.message}</p>
                             </div>  
@@ -149,24 +141,33 @@ const MessagesLists = ({user,socket,contactInfo,viewMessages,onlineUsers}) => {
                             <p style={{height:'fit-content'}}>{message.time}</p>
                             <button className="commentDeleteButton" style={{backgroundColor:'transparent',width:'30px',height:'30px',justifyContent:'center',alignItems:'center',borderRadius:'50%',border:'none',color:'grey',position:'absolute',right:'10px',bottom:'0px'}} onClick={()=> dispatch(deleteMessage(index))}><i class="fa-regular fa-trash-can"></i></button>
 
-                            <div style={{padding:'10px',display:'flex',flexDirection:'column', maxWidth:'200px',border:'1px solid blue',borderRadius:'10px 0px 10px 10px',height:'fit-content',margin:'0px 5px 0px 5px'}}>
+                            <div style={{padding:'10px',display:'flex',flexDirection:'column', maxWidth:'200px',backgroundColor:'#023e8a',borderRadius:'10px 0px 10px 10px',height:'fit-content',margin:'0px 5px 0px 5px'}}>
                                 <p style={{width:'100%',margin:'0px 0px 5px 0px',textAlign:'end'}}>{message.userName}</p> 
                                 <p style={{width:'100%',margin:'0px',height:'fit-content',maxWidth:'350px', display:'flex',flexWrap:'wrap'}}>{message.message}</p>
                             </div> 
                             
-                            {/* <div style={{height:'fit-content'}}>
-                                <div style={{width:'40px',height:'40px',borderRadius:'50%',backgroundColor:'grey'}}></div>
-                            </div> */}
                         </div></div>
-                    }):<div><p>There are no messages</p></div>}
+                    }):<div><p>There are no messages</p></div> : <div style={{height:'inherit',display:'flex',justifyContent:'center',position:'relative'}}>
+                    <div class="spinner" >
+                        <div></div>   
+                        <div></div>    
+                        <div></div>    
+                        <div></div>    
+                        <div></div>    
+                        <div></div>    
+                        <div></div>    
+                        <div></div>    
+                        <div></div>    
+                        <div></div>    
+                    </div>
+                </div>}
             </div>  
-            {/* <div>
-                {Object.keys(contactInfo).length !== 0 && <h2>This is {contactInfo.contact.username} chat window</h2>}
-            </div> */}
+
             <div style={{height:'fit-content'}}> 
                 <div style={{margin:'auto auto' ,width:'70%' }}>
-                    <input name='text' type='text' onChange={enterMessage} value={messageText} style={{width:'70%', height:'20px'}}/>
-                    <button onClick={sendMessage}>Send</button>
+                    <input className="inputButton" name='text' type='text' onChange={enterMessage} value={messageText} style={{width:'75%', height:'35px',backgroundColor:'transparent',border:'1px solid grey',borderRadius:'20px',padding:'0px 10px',color:'white'}}/>
+                    <button onClick={sendMessage}>Send</button> 
+                    
                 </div>
                 
             </div>

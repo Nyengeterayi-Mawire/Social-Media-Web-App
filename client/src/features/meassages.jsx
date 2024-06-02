@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"; 
 const initialState = {value : {messages : [],online : []}}
-// {message:'How are you doing',date:'10 Jan 2024',time:'11:25',userName:'3',userPhoto:''},{message:'Im doing well and yourself',date:'10 Jan 2024',time:'12:15',userName:'4',userPhoto:''}]
 export const messageSlice = createSlice({
     name : 'messages', 
     initialState, 

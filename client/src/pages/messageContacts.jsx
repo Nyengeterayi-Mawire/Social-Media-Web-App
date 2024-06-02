@@ -5,9 +5,7 @@ import { useState,useEffect } from "react";
 import { setOnline,addOnline } from "../features/meassages"; 
 import axios from 'axios';
 
-// import MessagesLists from "../components/messagesLists";
 const MessageContacts=({socket})=>{ 
-    // const [onlineUsers,setOnlineUsers] = useState([]);
     const dispatch = useDispatch() ;
     const onlineUsers = useSelector(state => state.messages.value.online);
     const token = useSelector(state=>state.user.value.token)
@@ -34,8 +32,7 @@ const MessageContacts=({socket})=>{
     console.log('user -----',user)
     return( 
         
-        <div className="messageContacts" style={{width:'70%',margin:'auto auto',borderRight:'1px solid grey',borderLeft:'1px solid grey'}}>
-            {/* <Navbar user={user}></Navbar>  */} 
+        <div className="messageContacts" style={{width:'70%',margin:'auto auto',borderRight:'1px solid rgb(58,59,60)',borderLeft:'1px solid rgb(58,59,60)'}}>
             
             <MessageContactsComp user={user} socket={socket} onlineUsers={onlineUsers}/> 
             

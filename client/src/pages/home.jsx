@@ -20,17 +20,20 @@ const Home = () => {
         // } 
         axios.get('/post/',{headers : {
             'Authorization' : token,
-        }}).then(res=>dispatch(setPosts(res.data))).catch(err=>console.log(err)); 
+        }}).then(res=>{
+            console.log('fetching posts',res.data)
+            dispatch(setPosts(res.data))
+        }).catch(err=>console.log(err)); 
 
        
 
     
         axios.get('/socket').then(res=>dispatch(setOnline((res.data))))
 
-    },[dispatch,user])
+    },[])
     return (  
         
-        <div className="Home" style={{width:'70%',margin:'auto auto',borderRight:'1px solid grey',borderLeft:'1px solid grey'}} >  
+        <div className="Home" style={{width:'70%',margin:'auto auto',borderRight:'1px solid rgb(58,59,60)',borderLeft:'1px solid rgb(58,59,60)'}} >  
             <Navbar user={user}/>
             <HomePosts user={user} postsList={postsList}/>
             <RightNavbar/>

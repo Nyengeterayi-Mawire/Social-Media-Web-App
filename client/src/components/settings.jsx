@@ -64,7 +64,13 @@ const SettingsComponent =({user})=> {
           dispatch(changeSettings(form)) 
           setError('')
           setImage('')
-          toast.success('successfully updated profile')
+          toast.success('successfully updated profile',{ 
+            style:{
+              backgroundColor:'rgb(58,59,60)',
+              color:'#fff', 
+              
+            }            
+          })
         }})
       .catch(err=>console.log(err));  
   }
@@ -82,15 +88,15 @@ const SettingsComponent =({user})=> {
                <h2>User Info</h2>
               <div className="textInputSettingsForm"> 
                 <label style={{paddingLeft:'10px'}}>Username</label>
-                <input className="input" style={{width:'150px',height:'25px',borderRadius:'15px',paddingLeft:'10px',marginTop:'10px'}} name='username' placeholder="username" onChange={handleTextInput} />
+                <input className="input" style={{width:'150px',height:'25px',borderRadius:'15px',paddingLeft:'10px',marginTop:'10px'}} name='username' placeholder="username..." onChange={handleTextInput} />
               </div>
               <div className="textInputSettingsForm"> 
                 <label style={{paddingLeft:'10px'}}>Password</label>
-                <input className="input" style={{width:'150px',height:'25px',borderRadius:'15px',paddingLeft:'10px',marginTop:'10px'}} name='password' placeholder="username" onChange={handleTextInput} />
+                <input className="input" style={{width:'150px',height:'25px',borderRadius:'15px',paddingLeft:'10px',marginTop:'10px'}} name='password' placeholder="password..." onChange={handleTextInput} />
               </div>
               <div className="textInputSettingsForm"> 
                 <label style={{paddingLeft:'10px'}}>Confirm password</label>
-                <input className="input" style={{width:'150px',height:'25px',borderRadius:'15px',paddingLeft:'10px',marginTop:'10px'}} name='confirmpassword' placeholder="username" onChange={handleTextInput} />
+                <input className="input" style={{width:'150px',height:'25px',borderRadius:'15px',paddingLeft:'10px',marginTop:'10px'}} name='confirmpassword' placeholder="confirm password..." onChange={handleTextInput} />
               </div>
 
             </div > 
@@ -98,15 +104,15 @@ const SettingsComponent =({user})=> {
               <h2>Personal Info</h2> 
               <div className="textInputSettingsForm"> 
                 <label style={{paddingLeft:'10px'}}>Name</label>
-                <input className="input" style={{width:'150px',height:'25px',borderRadius:'15px',paddingLeft:'10px',marginTop:'10px'}} name='firstname'  placeholder="name" onChange={handleTextInput} />
+                <input className="input" style={{width:'150px',height:'25px',borderRadius:'15px',paddingLeft:'10px',marginTop:'10px'}} name='firstname'  placeholder="name..." onChange={handleTextInput} />
               </div>
               <div className="textInputSettingsForm"> 
                 <label style={{paddingLeft:'10px'}}>Surname</label>
-                <input className="input" style={{width:'150px',height:'25px',borderRadius:'15px',paddingLeft:'10px',marginTop:'10px'}} name='lastname'  placeholder="surname" onChange={handleTextInput} />
+                <input className="input" style={{width:'150px',height:'25px',borderRadius:'15px',paddingLeft:'10px',marginTop:'10px'}} name='lastname'  placeholder="surname..." onChange={handleTextInput} />
               </div>
               <div className="textInputSettingsForm"> 
                 <label style={{paddingLeft:'10px'}}>Email</label>
-                <input className="input" style={{width:'150px',height:'25px',borderRadius:'15px',paddingLeft:'10px',marginTop:'10px'}} name='email' type="email"  placeholder="email" onChange={handleTextInput} />
+                <input className="input" style={{width:'150px',height:'25px',borderRadius:'15px',paddingLeft:'10px',marginTop:'10px'}} name='email' type="email"  placeholder="email..." onChange={handleTextInput} />
               </div>
             </div>  
             <div style={{margin:'20px 0px',display:'grid',placeItems:'center'}}> 
@@ -117,14 +123,6 @@ const SettingsComponent =({user})=> {
          
       </form> 
 
-      {/* <Register/> */} 
-      {/* <Login/> */}
-
-      {/* {image && <img src={`http://localhost:3001/${image.media[0].filename}`} alt=''></img>} */}
-      {/* {image && image.media.map((set)=>{
-        
-        return <img src={`http://localhost:3001/${set.filename}`} alt='image' style={{width:'25%',height:'25%'}}></img>
-      })} */}
         </div>
     )
 }
