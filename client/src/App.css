@@ -101,7 +101,7 @@ body::-webkit-scrollbar {
 
 /*Home page CSS*/
 .Home, .addPost, .profile,.messageContacts,.settings,.pictureComments,.messageContactsComp{
-  /* border:1px solid navy; */
+  
   
   height: 94vh;
   display : flex; 

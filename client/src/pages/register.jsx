@@ -36,7 +36,7 @@ const Register = () => {
         
     }
     return(
-        <div style={{ width:'100%',border:'1px solid blue',display:'flex'}}>
+        <div style={{ width:'100%',display:'flex'}}>
             <form class="form" onSubmit={handleSubmit} style={{margin:'auto ',justifyItems:'center'}}>
     <p class="title">Register </p>
     <p class="message">Signup now and get full access to our app. </p>

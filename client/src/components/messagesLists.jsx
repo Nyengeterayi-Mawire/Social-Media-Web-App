@@ -123,7 +123,7 @@ const MessagesLists = ({user,socket,contactInfo,viewMessages,onlineUsers}) => {
                 <h3 style={{marginLeft:'10px'}}>{username}</h3>
             </div>
             <div style={{borderTop:'1px solid grey',height:'80%',overflowY:'scroll',scrollbarWidth:'none' }}>
-                   {!isLodaing ? messages.length !== 0 ? messages.map((message,index)=> {
+                   {messages.length !== 0 ? messages.map((message,index)=> {
                         return  user._id !== message.senderID?<div style={{display:'flex',padding:'0px 0px',width:'fit-content',position:'relative',alignItems:'flex-start',margin:'10px 30px 10px 10px'}}>
                             <div style={{padding:'10px',display:'flex',flexDirection:'column', maxWidth:'350px',backgroundColor:'#343a40',borderRadius:'0px 10px 10px 10px',height:'fit-content',margin:'0px 5px 10px 25px'}}>
                                 <p style={{ width:'100%',margin:'0px 0px 5px 0px'}}>{message.userName}</p> 
@@ -147,20 +147,7 @@ const MessagesLists = ({user,socket,contactInfo,viewMessages,onlineUsers}) => {
                             </div> 
                             
                         </div></div>
-                    }):<div><p>There are no messages</p></div> : <div style={{height:'inherit',display:'flex',justifyContent:'center',position:'relative'}}>
-                    <div class="spinner" >
-                        <div></div>   
-                        <div></div>    
-                        <div></div>    
-                        <div></div>    
-                        <div></div>    
-                        <div></div>    
-                        <div></div>    
-                        <div></div>    
-                        <div></div>    
-                        <div></div>    
-                    </div>
-                </div>}
+                    }):<div style={{height:'80%',display:'flex',justifyContent:'center',alignItems:'center'}}><p>There are no messages</p></div> }
             </div>  
 
             <div style={{height:'fit-content'}}> 

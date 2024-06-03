@@ -52,7 +52,7 @@ const Login = ({socket}) => {
     }
     
     return(
-        <div className="Login" style={{ width:'100%',border:'1px solid blue',display:'flex'}}>
+        <div className="Login" style={{ width:'100%',display:'flex'}}>
             <form class="form" onSubmit={handleSubmit} style={{margin:'auto ',justifyItems:'center'}}>
     <p class="title">Login </p>
     <p class="message">Log in and get socializing </p>

@@ -5,6 +5,7 @@ import axios from 'axios';
 import Register from './pages/register'; 
 import Login from './pages/login'; 
 import {BrowserRouter as Router,Route, Routes,Navigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 import Home from './pages/home'; 
 import  Navbar  from './components/navbar'; 
 import TopNavbar from './components/topNavbar';
@@ -27,15 +28,20 @@ import { addComment,addPost,addContact } from './features/userSlice';
 function App() {  
   const user = useSelector((state)=>state.user.value.logged) 
   const userLoggedIn = useSelector((state)=> state.user.value.user)
-  const socket = useSelector((state)=>state.user.value.socket)
+  const socket = useSelector((state)=>state.user.value.socket) 
+  const navigate = useNavigate()
+  
   const dispatch = useDispatch();
-  console.log('logged',user); 
+  console.log('logged',user);  
+
 
   // const [form,setForm] = useState({photo:''}) 
   // const [image,setImage] = useState(null); 
   // const id = '663243a5f6f407926bd63331'  
 
-  console.log('userLOggedIn--- App.js',userLoggedIn)
+ useEffect(()=>{
+    navigate('/login')
+ },[])
 
   useEffect(()=>{
         if(socket){
@@ -74,45 +80,12 @@ function App() {
         }
         
       },[socket]);  
-    
-     
-    
-        
-      
-  //   } 
-  //   get();
-  // },[])
 
-  // function handle(e){
-  //   setForm({...form,[e.target.name]: e.target.files[0]}); 
-  //   console.log(form.photo);
-  // } 
-
-  // function submit(e){
-  //   e.preventDefault(); 
-  //   const formData = new FormData(); 
-  //   formData.append('photo',form.photo);  
-  //   console.log(formData); 
-
-  //   axios.patch(`/post/uploadMedia/${id}`, formData)
-  //     .then(res=>console.log(res))
-  //     .catch(err=>console.log(err)); 
-
-    
-
-    
-  // } 
-  // console.log(image);
   return (
-    <div className="App">   
-    
-    <Router>  
-      <Toaster position='bottom-center'/>
-      
-      <TopNavbar socket={socket}/> 
-      
-      <Routes>
-      
+    <div className="App">      
+      <Toaster position='bottom-center'/>      
+      <TopNavbar socket={socket}/>       
+      <Routes>      
         <Route path='/login' element={!user?<Login socket={socket}/>:<Navigate to='/home'></Navigate>}></Route> 
         <Route path='/register' element={!user?<Register/>:<Navigate to='/home'/>}/>
         <Route path='/home' element={user?<Home/>:<Navigate to='/login'/>}/> 
@@ -120,26 +93,10 @@ function App() {
         <Route path='/profile' element={user?<Profile/>:<Navigate to='/login'/>}/> 
         <Route path='/messages' element={user?<MessageContacts socket={socket}/>:<Navigate to='/login'/>}/> 
         <Route path='/settings' element={user?<Settings socket={socket}/>:<Navigate to='/login'/>}/> 
-        <Route path='/picture' element={user?<Picturecomments socket={socket}/>:<Navigate to='/login'/>}/> 
-
-        
-      </Routes>
-      
-      
-    </Router>
-      {/* <form action='upload/' method='POST' onSubmit={submit} encType='multipart/form-data'>
-         <input type='file' name='photo' onChange={handle}></input> 
-         <button type='submit'>Submit</button>
-      </form>  */}
-
-      {/* <Register/> */} 
-      {/* <Login/> */}
-
-      {/* {image && <img src={`http://localhost:3001/${image.media[0].filename}`} alt=''></img>} */}
-      {/* {image && image.media.map((set)=>{
-        
-        return <img src={`http://localhost:3001/${set.filename}`} alt='image' style={{width:'25%',height:'25%'}}></img>
-      })} */}
+        <Route path='/picture' element={user?<Picturecomments socket={socket}/>:<Navigate to='/login'/>}/>         
+      </Routes>     
+    
+    
     </div>
   );
 }
