@@ -20,20 +20,24 @@ const createPost = async(req,res) => {
         // console.log(data); 
         // console.log('data',data);
         if(!req.file){
-            return res.status(401).json('No image was uploaded');
+            return res.status(401).json({err:'No image was uploaded'});
         }  
         const post = await Posts.create(data);  
         // console.log('returned post',post._id);
         if(!post){
-            return res.status(401).json('failed to create post');
+            return res.status(401).json({err:'failed to create post'});
         }            
-        const updatePost = await Posts.findByIdAndUpdate(post._id,{$push:{media:req.file}});  
+        const addMediatoPost = await Posts.findByIdAndUpdate(post._id,{$push:{media:req.file}});  
         // console.log('returned updatePost',updatePost);
-        if(!updatePost){
-            return res.status(200).json('Failed to  save image to database')
-        } 
+        if(!addMediatoPost){
+            return res.status(200).json({err:'Failed to  save image to database'})
+        }  
+        const updatedPost = await Posts.findById(post._id) 
+        if (!updatedPost){
+            return res.status(200).json({err:'Could not find the post'})
+        }
         
-        res.status(200).json("image uploaded successfully")
+        res.status(200).json(updatedPost)
     }catch(err){ 
         res.status(401).json({mssg:err.message});
     }
