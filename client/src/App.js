@@ -69,6 +69,7 @@ function App() {
           // })
           socket.on('sendMessage',data=>{ 
             if (userLoggedIn.messaging.filter(contactID => contactID === data.details.senderID).length === 0){
+              console.log('I dont wnt this to run')
               dispatch(addContact(data.details.senderID))
             } 
             console.log('inside send message socket', userLoggedIn)

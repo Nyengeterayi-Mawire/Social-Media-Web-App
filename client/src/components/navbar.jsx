@@ -58,8 +58,8 @@
             console.log('successfully unadded friend',res.data);
         })
         dispatch(removeFriend(user._id)); 
-        const  isUserOnline = onlineUsers.filter(online=>online.userID === user._id)[0]; 
-        if (isUserOnline){ 
+        const  isUserOnline = onlineUsers.filter(online=>online.userID === user._id); 
+        if (isUserOnline.length !== 0){ 
             // console.log('sendng.....',isUserOnline)
             socket.emit('unFollow',{socketID : isUserOnline[0].socketID, follower:userLoggedIn.username})
         }

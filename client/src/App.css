@@ -313,6 +313,12 @@ body::-webkit-scrollbar {
 
 .commentDeleteButton  :hover{
   color: red;
+} 
+
+/* Profile */ 
+.mediaHover :hover{
+  opacity: 60%;
+  
 }
 
 

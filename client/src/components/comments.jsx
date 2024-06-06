@@ -58,9 +58,10 @@ const Comments = ({postID,post,userID}) => {
     const handleCommentSubmit =() => {
         console.log('this is the message',{postID,userID,text:commentText}) 
         setCommentText('')
-        axios.post('/comment/add/'+postID,{postID,userID,text:commentText},{headers:{'Authorization': token}}).then(res=>{
+        axios.patch('/comment/add/'+postID,{postID,userID,text:commentText},{headers:{'Authorization': token}}).then(res=>{
             if(res.data.err){
-                console.log('there was error',res.data.err)
+                console.log('there was error',res.data.err) 
+                toast.error(res.data.err)
             }else{
                 setNewComment(res.data)
                 socket.emit('commentNotification',{userID:user._id ,username:user.username,userLiked:onlineUsers.filter( onlineUser => onlineUser.userID === post.userID)[0] })

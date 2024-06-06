@@ -22,8 +22,12 @@ const MessageContactsComp = ({onlineUsers,socket,user}) => {
         socket.on('sendMessage',data=>{ 
             console.log('running')
             if (followedUsers){
-                if(followedUsers.filter(user=>user._id !== data.from)){
+                // if(followedUsers.filter(user=>user._id === data.from).length !== 0){
+                //     axios.get('/register/'+data.from,{headers:{'Authorization': token}}).then(res=>setFollowedUsers([...followedUsers,res])) 
+                // }
+                if(user.messaging.filter(contact => contact === data.from).length === 0){
                     axios.get('/register/'+data.from,{headers:{'Authorization': token}}).then(res=>setFollowedUsers([...followedUsers,res])) 
+
                 }
             }
           

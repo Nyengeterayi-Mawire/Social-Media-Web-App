@@ -39,8 +39,8 @@ const HomePosts = ({user,postsList}) => {
     const handleSubmitComment = (post) => { 
         if(commentText && commentText.trim() !== ''){ 
             console.log('comment',{postID:post._id,userID:user._id,text:commentText});
-            axios.post('/comment/add/'+post._id,{headers:{'Authorization': token}},{postID:post._id,userID:user._id,text:commentText}); 
-            if( onlineUsers.filter(onlineUser => onlineUser.userID === post.userID)){
+            axios.patch('/comment/add/'+post._id,{postID:post._id,userID:user._id,text:commentText},{headers:{'Authorization': token}}); 
+            if( onlineUsers.filter(onlineUser => onlineUser.userID === post.userID).length !== 0){
                 socket.emit('commentNotification',{userID:user._id ,username:user.username,userLiked:onlineUsers.filter( onlineUser => onlineUser.userID === post.userID)[0] }) 
             } 
             setCommentText('');
@@ -48,18 +48,19 @@ const HomePosts = ({user,postsList}) => {
         }
         
     }
-    console.log('posts',postsList)
+    // console.log('posts',postsList)
     return(
         <div className="homePosts" style={{overflowY:'scroll', overflowStyle: 'none', scrollbarWidth:'none'}}> 
         {postsList && !loading && userList.length !== 0 ? postsList.map((post,index)=>{  
                              
             const postUser = userList.filter(user=>user.data._id === post.userID)[0]
+            // console.log('this is the post user',postUser)
             const vid = post.media[0].mimetype.indexOf('video')
             
             return <div className="postWidget" style={{marginTop:'20px'}}>
             <div className="postWidgetUserSection" style={{display:'flex',height:'fit-content',padding:'5px 0px 5px 15px',alignItems:'center'}}> 
-                 {postUser.data.photo ? <img src={postUser.data.photo} alt='profile' style={{width:'40px' ,height:'40px',borderRadius:'50%'}}/>:<div style={{width:'40px' ,height:'40px',borderRadius:'50%',backgroundColor:'grey'}}></div>}
-                <Link className="Link" to='/profile' state={post.userID}><p style={{marginLeft:'10px'}}>{post.userUsername}</p></Link>
+                {postUser.data.photo ? <img src={postUser.data.photo} alt='profile' style={{width:'40px' ,height:'40px',borderRadius:'50%'}}/>:<div style={{width:'40px' ,height:'40px',borderRadius:'50%',backgroundColor:'grey'}}></div>}
+                {postUser.data.username && <Link className="Link" to='/profile' state={post.userID}><p style={{marginLeft:'10px'}}>{postUser.data.username}</p></Link>}
             </div> 
             <div className="postWidgetImageSection" style={{paddingBottom:'10px'}}> 
                 {vid !== 0?<img src={`http://localhost:3001/${post.media[0].filename}`} alt={post.media[0].filename}></img>:<video controls  ><source src={`http://localhost:3001/${post.media[0].filename}`}type='video/mp4'/></video>}
@@ -75,8 +76,8 @@ const HomePosts = ({user,postsList}) => {
             <div className="postWidgetCommentSection" style={commentButton?{padding:'5px 10px 15px 10px'}:{display:'none'}}> 
                 <div style={{display:'flex'}}>
                     {user.photo ?<img src={user.photo} style={{width:'30px', height:'30px', borderRadius:'50%'}}/>:<div style={{width:'30px', height:'30px', borderRadius:'50%',backgroundColor:'grey'}}></div>}
-                    <input type='text' onChange={(e)=>setCommentText(e.target.value)} name='comment' value={commentText} placeholder="Add comment ...." style={{marginLeft:'10px',width:'80%',backgroundColor:'transparent',borderBottom:'grey'}}/> 
-                    <button onClick={()=>handleSubmitComment(post)}>Submit</button>
+                    <input type='text' onChange={(e)=>setCommentText(e.target.value)} name='comment' value={commentText} placeholder="Add comment ...." style={{marginLeft:'10px',width:'80%',backgroundColor:'transparent',borderBottom:'grey',color:'white'}}/> 
+                    <button onClick={()=>handleSubmitComment(post)} style={{}}>Submit</button>
                 </div>
                 
             </div>
