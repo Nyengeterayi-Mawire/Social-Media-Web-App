@@ -69,14 +69,14 @@ const MessagesLists = ({user,socket,contactInfo,viewMessages,onlineUsers}) => {
 
     function sendMessage(){ 
         console.log('converstaion Id',conversationID)
-        // axios.post('/message/sendmessage/'+conversationID,{
-        //     messageText,
-        //     senderID : user._id,  
-        //     receiverID : contactInfo.contact.data._id,
-        //     conversationID,
-        //     date : new Date(),
-        //     time : new Date().getHours() + ":" + new Date().getMinutes()
-        // },{headers:{'Authorization': token}}).then(res=>console.log('message sent',res.data))
+        axios.post('/message/sendmessage/'+conversationID,{
+            messageText,
+            senderID : user._id,  
+            receiverID : contactInfo.contact.data._id,
+            conversationID,
+            date : new Date(),
+            time : new Date().getHours() + ":" + new Date().getMinutes()
+        },{headers:{'Authorization': token}}).then(res=>console.log('message sent',res.data))
 
         if(onlineUsers.filter(onlineUser=>onlineUser.userID === contactInfo.contact.data._id).length !== 0){
             socket.emit('sendMessage',{sendTo : onlineUsers.filter(onlineUser=>onlineUser.userID === contactInfo.contact.data._id)[0], details:{
