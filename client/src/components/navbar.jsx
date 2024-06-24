@@ -10,21 +10,16 @@
  
  const Navbar = ({user}) => { 
     const navigate = useNavigate();
-    const dispatch = useDispatch(); 
-    const [followFollowing,setFollowFollowing] = useState([]);
-    // const [user,setUser] = useState({});
+    const dispatch = useDispatch();    
     const show = useSelector(state => state.navbar.value.leftNavbar);  
     const userLoggedIn = useSelector(state => state.user.value.user); 
     const showProfile = useSelector(state => state.navbar.value.search); 
-    const token = useSelector(state=>state.user.value.token) 
-    const displayFollowers = useSelector(state => state.navbar.value.showFollowers); 
-    const displayFollowing = useSelector(state => state.navbar.value.showFollowing); 
+    const token = useSelector(state=>state.user.value.token)   
     const onlineUsers = useSelector(state=>state.messages.value.online);  
     const socket = useSelector(state => state.user.value.socket);
-    const [numberFollowing,setNumberFollowing] = useState(user.following); 
-    const [numberFollowers,setNumberFollowers] = useState(user.followers); 
-    const [followingList,setFollowingList] = useState([]);
-    const [followersList,setFollowersList] = useState([]);
+    const [numberFollowing,setNumberFollowing] = useState([]); 
+    const [numberFollowers,setNumberFollowers] = useState([]); 
+  
      
     console.log('token is',token)
     useEffect(()=>{
@@ -35,7 +30,8 @@
             toast.success(`${data}  unfollowed you`)
         })  
         console.log('user to fetch',user)
-        
+        setNumberFollowers(user.followers) 
+        setNumberFollowing(user.following)
     },[socket,user])  
 
    
@@ -45,6 +41,7 @@
             // console.log('successfully added friend',res.data);
         })
         dispatch(addFriend(user._id)); 
+        setNumberFollowers(state=>state = [...state, user._id]) 
         const  isUserOnline = onlineUsers.filter(online=>online.userID === user._id); 
         if (isUserOnline.length !== 0){ 
             // console.log('sendng.....',isUserOnline)
@@ -58,6 +55,7 @@
             console.log('successfully unadded friend',res.data);
         })
         dispatch(removeFriend(user._id)); 
+        setNumberFollowers(numberFollowers.filter(followerID => followerID !== user._id))
         const  isUserOnline = onlineUsers.filter(online=>online.userID === user._id); 
         if (isUserOnline.length !== 0){ 
             // console.log('sendng.....',isUserOnline)
@@ -95,7 +93,8 @@
                             dispatch(showFollowers(false))
                             dispatch(showFollowing(true))}}>
                         <p style={{color:'rgb(176 179 184)'}}>Following</p>
-                        {user.following  ? <p> {user.following.length}</p> : <p>0</p>}  
+                        {/* {user.following  ? <p> {user.following.length}</p> : <p>0</p>}   */}
+                        {numberFollowing  ? <p> {numberFollowing.length}</p> : <p>0</p>}  
                         </button>
                         
                     </div>
@@ -105,7 +104,8 @@
                             dispatch(showFollowers(true))
                             }}>
                         <p>Followers</p>
-                        {user.followers ?<p>{user.followers.length}</p>:<p>0</p>} 
+                        {/* {user.followers ?<p>{user.followers.length}</p>:<p>0</p>}  */}
+                        {numberFollowers  ? <p> {numberFollowers.length}</p> : <p>0</p>}  
                         </button>
                     </div>
                     

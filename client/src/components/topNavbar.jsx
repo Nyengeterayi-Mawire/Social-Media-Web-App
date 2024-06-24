@@ -80,10 +80,9 @@ const TopNavbar = ({socket}) => {
                      dispatch(logout()); 
                      dispatch(hide())
                     navigate('/login');  
-                    socket.disconnect();
-                   
+                    socket.disconnect();    
                     
-                        //  dispatch(hide());
+                        
                          }}><i class="fa-solid fa-arrow-right-from-bracket"></i></button> 
             </div> 
 

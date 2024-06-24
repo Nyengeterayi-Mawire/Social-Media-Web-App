@@ -17,7 +17,7 @@ const ProfileComp = ({user,postList}) => {
                 
                     {postList ? postList.map((post,index)=>{
                         const type = post.media[0].mimetype.includes('video') 
-                        console.log('tyyyypppeee',type)
+                        
                         return <Link style={{margin:'10px 10px 10px 10px'}} to='/picture' state={{user,post}} >
                                 {!type ?<img className="mediaHover" src={`http://localhost:3001/${post.media[0].filename}`} style={{width:'200px',height:'250px',objectFit:'cover',borderRadius:'10px'}}/>:<video style={{width:'200px',height:'250px',objectFit:'cover',borderRadius:'10px'}}><source src={`http://localhost:3001/${post.media[0].filename}`}/></video>}
                             </Link>
