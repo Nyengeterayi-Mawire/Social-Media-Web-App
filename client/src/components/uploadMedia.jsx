@@ -61,7 +61,7 @@ const UploadMedia =()=> {
             color:'#fff',             
           }}) ;
           setUrl('');
-          socket.emit('addPost',res.data);
+          // socket.emit('addPost',res.data);
           console.log('this is the uploaded picture',res.data)
         }})
       .catch(err=>console.log(err)); 

@@ -57,7 +57,7 @@ const HomePosts = ({user,postsList}) => {
             // console.log('this is the post user',postUser)
             const vid = post.media[0].mimetype.indexOf('video')
             
-            return <div className="postWidget" style={{marginTop:'20px'}}>
+            return <div key ={index} className="postWidget" style={{marginTop:'20px'}}>
             <div className="postWidgetUserSection" style={{display:'flex',height:'fit-content',padding:'5px 0px 5px 15px',alignItems:'center'}}> 
                 {postUser.data.photo ? <img src={postUser.data.photo} alt='profile' style={{width:'40px' ,height:'40px',borderRadius:'50%'}}/>:<div style={{width:'40px' ,height:'40px',borderRadius:'50%',backgroundColor:'grey'}}></div>}
                 {postUser.data.username && <Link className="Link" to='/profile' state={post.userID}><p style={{marginLeft:'10px'}}>{postUser.data.username}</p></Link>}

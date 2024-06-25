@@ -19,18 +19,14 @@ const MessagesLists = ({user,socket,contactInfo,viewMessages,onlineUsers}) => {
     const dispatch = useDispatch(); 
 
     useEffect(()=>{
-        // socket.emit('privateMessage',data=>{
-        //     // setMessages1([...messages,data])
-        //     // dispatch(addMessage(data));
-        // })   
-        
+       
         dispatch(setMessageList([])) 
         setConversationID('0')
         // Object.keys(contactInfo).length !== 0
         if( Object.keys(contactInfo.contact).length !== 0){
             axios.post('/message/conversation',{userLoggedIn : user._id,contactToMessage :contactInfo.contact.data._id},{headers:{'Authorization': token}}).then(res=>{
                 
-                console.log('res',res.data)  
+                console.log('res conversation',res.data)  
                 if(Object.keys(res.data).length !== 0){
                     setConversationID(res.data._id)
                     console.log('message convo id',res.data)
@@ -124,7 +120,7 @@ const MessagesLists = ({user,socket,contactInfo,viewMessages,onlineUsers}) => {
             </div>
             <div style={{borderTop:'1px solid grey',height:'80%',overflowY:'scroll',scrollbarWidth:'none' }}>
                    {messages.length !== 0 ? messages.map((message,index)=> {
-                        return  user._id !== message.senderID?<div style={{display:'flex',padding:'0px 0px',width:'fit-content',position:'relative',alignItems:'flex-start',margin:'10px 30px 10px 10px'}}>
+                        return  user._id !== message.senderID?<div key={index} style={{display:'flex',padding:'0px 0px',width:'fit-content',position:'relative',alignItems:'flex-start',margin:'10px 30px 10px 10px'}}>
                             <div style={{padding:'10px',display:'flex',flexDirection:'column', maxWidth:'350px',backgroundColor:'#343a40',borderRadius:'0px 10px 10px 10px',height:'fit-content',margin:'0px 5px 10px 25px'}}>
                                 <p style={{ width:'100%',margin:'0px 0px 5px 0px'}}>{message.userName}</p> 
                                 <p style={{width:'100%',margin:'0px',height:'fit-content',maxWidth:'350px', display:'flex',flexWrap:'wrap'}}>{message.message}</p>
@@ -135,7 +131,7 @@ const MessagesLists = ({user,socket,contactInfo,viewMessages,onlineUsers}) => {
                             <button className="commentDeleteButton" style={{backgroundColor:'transparent',width:'30px',height:'30px',justifyContent:'center',alignItems:'center',borderRadius:'50%',border:'none',color:'grey',position:'absolute',bottom:'0px',left:'0px'}} onClick={()=> dispatch(deleteMessage(index))}><i class="fa-regular fa-trash-can"></i></button>
                             
                             
-                        </div> : <div style={{display:'flex', justifyContent:'right',position:'relative' }}>
+                        </div> : <div key={index} style={{display:'flex', justifyContent:'right',position:'relative' }}>
                             <div style={{display:'flex',padding:'0px 0px',margin:'10px 30px 10px 10px'}}>
                             {/* <img style={{width:'40px',height:'40px',borderRadius:'50%'}}/>  */} 
                             <p style={{height:'fit-content'}}>{message.time}</p>
