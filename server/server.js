@@ -8,77 +8,83 @@ const userRouter = require('./routes/userRoutes.js');
 const postsRouter = require('./routes/postsRoutes.js') 
 const commentsRouter = require('./routes/commentsRoutes.js'); 
 const messageRouter = require('./routes/messageRoutes.js');
-// const {auth} = require('./middleware/auth.js') 
+const path = require('path');
 
-const app = express();   
+const app = express(); 
+//middlewares  
 app.use(express.json());
- app.use(cors());  
- app.use(express.static('upload')); 
+app.use(cors());  
+app.use(express.static('upload')); 
+app.use(express.static(path.join(__dirname, 'client/build')));
 
- const server = http.createServer(app);
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+});
 
- const io= new Server(server,{
-     cors : {
-         origin : "http://localhost:3000", 
-         methods : ["GET","POST"]
-     }
- })
- 
- 
- 
- 
- let userList = []
- io.on("connection",(socket)=>{
-     console.log(`user : ${socket.handshake.query.username} with id number ${socket.handshake.query.userID} has socket id ${socket.id}`) 
-     userList.push({userID :socket.handshake.query.userID , username: socket.handshake.query.username, socketID : socket.id })
-     console.log('list',userList);  
+//create http server
+const server = http.createServer(app);
 
-     io.emit('newLogin',{userID :socket.handshake.query.userID , username: socket.handshake.query.username, socketID : socket.id })
+const io= new Server(server,{
+    cors : {
+        origin : "http://localhost:3000", 
+        methods : ["GET","POST"]
+    }
+})
+
+
+
+//list of online users
+let userList = []
+io.on("connection",(socket)=>{
+    userList.push({userID :socket.handshake.query.userID , username: socket.handshake.query.username, socketID : socket.id })
+    io.emit('newLogin',{userID :socket.handshake.query.userID , username: socket.handshake.query.username, socketID : socket.id })
     socket.join('room'); 
     socket.on('addPost',data=>{ 
-        console.log(data)
         io.emit('addPost',data)
     })
-  
-     socket.to('room').emit('activeUsers',userList); 
 
-     socket.on('privateMessage',(data)=>{
+    socket.to('room').emit('activeUsers',userList); 
+
+    //send message
+    socket.on('privateMessage',(data)=>{
         socket.to(data.socketID).emit('privateMessage',data)
-     }) 
-
-     socket.on('follow',data=>{ 
-        console.log('data received',data)
+    }) 
+    //follow a user
+    socket.on('follow',data=>{ 
         socket.to(data.socketID).emit('follow',data.follower)
-     }) 
-     socket.on('unFollow',data=>{ 
-        console.log('data received',data)
+    }) 
+    //unfollow a user
+    socket.on('unFollow',data=>{ 
         socket.to(data.socketID).emit('unFollow',data.follower)
-     }) 
-     socket.on('likeNotification',data=>{
-        console.log(data) 
+    }) 
+    //like a post
+    socket.on('likeNotification',data=>{
         socket.to(data.userLiked.socketID).emit('likeNotification',data);
-     }); 
-     socket.on('commentNotification',data=>{ 
-        console.log(data) 
+    }); 
+    //comment on post
+    socket.on('commentNotification',data=>{ 
         socket.to(data.userLiked.socketID).emit('commentNotification',data)
-     }); 
-     socket.on('sendMessage',data=>{
-        console.log(data); 
+    }); 
+    //send message
+    socket.on('sendMessage',data=>{
         socket.to(data.sendTo.socketID).emit('sendMessage',data)
-     })
- 
-     socket.on("disconnect",()=>{ 
-        userList = userList.filter(user=>user.socketID !== socket.id)
-         console.log('user disconnected',socket.handshake.query.userID)
-         console.log(' new list',userList) 
-         io.emit('logout',socket.handshake.query.userID)
-     })
- })
+    })
 
+    //logout or disconnect
+    socket.on("disconnect",()=>{ 
+    userList = userList.filter(user=>user.socketID !== socket.id)
+        console.log('user disconnected',socket.handshake.query.userID)
+        console.log(' new list',userList) 
+        io.emit('logout',socket.handshake.query.userID)
+    })
+})
+
+//Request to get list of online users
 app.get('/socket',(req,res)=>{
     res.status(200).json(userList)
 })
 
+//Routes
 app.use('/register',userRouter);  
 app.use('/post',postsRouter);  
 app.use('/comment', commentsRouter);
@@ -88,8 +94,8 @@ app.use('/message',messageRouter);
 
 
 mongoose.connect(process.env.URL).then(()=>{
-    server.listen(process.env.PORT,()=>{
-        console.log('listening on port 3001')
-    })
+server.listen(process.env.PORT,()=>{
+    console.log('listening on port 3001')
+})
 }).catch((err)=>console.log(err))
 

@@ -1,5 +1,6 @@
 const Posts = require('../schemas/postsSchema');  
 
+//Get single post
 const getSinglepost = async(req,res) => { 
     try{
         const {id} = req.params; 
@@ -13,25 +14,24 @@ const getSinglepost = async(req,res) => {
     }
 }
 
+//Create a post
 const createPost = async(req,res) => {  
     try{ 
-        const data = req.body
-        // const {id} = req.params;  
-        // console.log(data); 
-        // console.log('data',data);
+        const data = req.body;
+        //Check to see if an image was uploaded
         if(!req.file){
             return res.status(401).json({err:'No image was uploaded'});
         }  
         const post = await Posts.create(data);  
-        // console.log('returned post',post._id);
         if(!post){
             return res.status(401).json({err:'failed to create post'});
-        }            
+        }   
+        //Add image file to media field of the created post         
         const addMediatoPost = await Posts.findByIdAndUpdate(post._id,{$push:{media:req.file}});  
-        // console.log('returned updatePost',updatePost);
         if(!addMediatoPost){
             return res.status(200).json({err:'Failed to  save image to database'})
-        }  
+        } 
+        //get updated post and send to client 
         const updatedPost = await Posts.findById(post._id) 
         if (!updatedPost){
             return res.status(200).json({err:'Could not find the post'})
@@ -44,10 +44,10 @@ const createPost = async(req,res) => {
     
 } ; 
 
+//Delete a post controller
 const deletePost =async (req,res) => {  
     try{
         const {id} = req.params;  
-        console.log('id of post',id)
         const post = await Posts.findByIdAndDelete(id); 
         if(!post){
             return res.json({err :'failed to delete post'})
@@ -74,43 +74,37 @@ const updatePostcomment = async(req,res) => {
     
 };   
 
+//Add a like to post 
 const updatePostlikes = async(req,res) => {  
     try{
         const {id} = req.params; 
         const data = req.body; 
-        // console.log(data)
+        //Find post
         const post = await Posts.findById(id)  
-        console.log(post);
-        
         if(!post){ 
            return res.json('Could not find post')
         }  
+        //Check if user id is in likes array, if yes then pull id from array
         if(post.likes.includes(data._id)){
-            console.log('user wants to unlike liked') ; 
             const likePost = await Posts.findByIdAndUpdate(id,{$pull:{likes:data._id}}) 
             if (likePost){
                 const updatedPost = await Posts.findById(id);
                 return res.status(200).json(updatedPost);
             }
         }
-        // console.log(post);
-        console.log('user wants to like '); 
+        //if user id does not exist push/add user id to likes array
         const likePost = await Posts.findByIdAndUpdate(id,{$push:{likes:data._id}}) 
         if (likePost){
             const updatedPost = await Posts.findById(id);
             return res.status(200).json(updatedPost);
         }
-
-        
-        
-        
-        // res.status(200).json(post);
     }catch(err){
         res.status(401).json({mssg:err.message});
     }
     
 };   
 
+//delete post comment controller
 const deletePostcomment = async(req,res) => {  
     try{
         const {id} = req.params; 
@@ -141,6 +135,7 @@ const deletePostlike = async(req,res) => {
     
 };   
 
+//
 const uploadMedia = async(req,res) => {
     try{
 
@@ -159,43 +154,21 @@ const uploadMedia = async(req,res) => {
         res.status(401).json({mssg:err.message});
     }
 } 
-// const updateMedia = async(req,res) => {
-//     try{
-        
-//         if(!req.file){
-//             return res.staus(401).json('No image was uploaded');
-//         } 
-//         const {id} = req.params;  
-//         console.log(req.file);
-//         const post = await Posts.findByIdAndUpdate(id,{$push:{media:req.file}}); 
-//         if(!post){
-//             return res.status(200).json('Failed to  save image to database')
-//         } 
-//         console.log(post);
-//         res.status(200).json("image uploaded successfully")
-//     }catch(err){
-//         res.status(401).json({mssg:err.message});
-//     }
-// } 
 
-const getMedia = async(req,res) => { 
-    // const post = await Posts.find({});
-    // console.log('fetxhed list',post) 
-    try{
-        
+//Get all posts
+const getMedia = async(req,res) => {   
+    try{        
         const post = await Posts.find({});
-        console.log('fetxhed list',post) 
         if(!post){
-            return res.status(401).json('There are no posts'); 
-
+            return res.status(401).json({err:'There are no posts'}); 
         } 
         res.status(200).json(post); 
-        // res.send('accepted')
     }catch(err){
         res.status(401).json({mssg:err.message});
     }
 } 
 
+//Get all posts for a particular user. Used in the Profile page
 const userPostList = async(req,res) => {
     try{
         const {id} = req.params; 

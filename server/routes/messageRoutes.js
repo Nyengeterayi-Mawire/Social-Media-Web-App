@@ -7,7 +7,7 @@ const {auth,tokenVerify} = require('../middleware/auth');
 
 router.post('/sendmessage/:id',tokenVerify,auth,sendMessage); 
 router.post('/deletemessage',tokenVerify,auth,deleteMessage);  
-router.post('/conversation',tokenVerify,auth,findConversation);
+router.post('/conversation/:id',tokenVerify,auth,findConversation);
 router.get('/:id',tokenVerify,auth,getMessages);
 
 module.exports = router;

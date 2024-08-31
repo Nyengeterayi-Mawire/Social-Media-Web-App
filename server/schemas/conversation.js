@@ -3,8 +3,14 @@ const mongoose = require('mongoose');
 const schema = mongoose.Schema; 
 
 const conversationSchema = new schema({
-    firstuser:String,
-    seconduser:String
+    firstuser:{
+        type: schema.Types.ObjectId,
+        ref: 'users'
+    },
+    seconduser:{
+        type: schema.Types.ObjectId,
+        ref: 'users'
+    },
 
 },{timestamps:true});
 

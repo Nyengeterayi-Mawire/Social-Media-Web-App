@@ -4,9 +4,18 @@ const conversation = require('./conversation');
 const schema = mongoose.Schema; 
 
 const messagesSchema = new schema({
-    conversationID : String,  
-    senderID : String,
-    receiverID : String,
+    conversationID : {
+        type: schema.Types.ObjectId,
+        ref: 'conversations'
+    }, 
+    senderID : {
+        type: schema.Types.ObjectId,
+        ref: 'users'
+    },
+    receiverID : {
+        type: schema.Types.ObjectId,
+        ref: 'users'
+    },
     message : String, 
     time: String, 
     date: String,

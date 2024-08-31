@@ -37,16 +37,9 @@ const getAllComments = async(req,res) => {
 const deleteComment = async(req,res) => { 
     try{
         const {id} = req.params; 
-        console.log('commentId',id) 
         const {postID} = req.body
         const comment = await Comment.findByIdAndDelete(id); 
-        // if(!comment) {
-        //     return res.json({err: 'failed to delete'}); 
-        // }
         const post = await Post.findByIdAndUpdate(postID,{$pull:{comments:comment._id}}) 
-        // if(!post){
-        //     return res.json({err:'could not delete comment'})
-        // } 
         return res.status(200).json(post)
     }catch(err){
         return res.json({err:err.message})
@@ -55,4 +48,4 @@ const deleteComment = async(req,res) => {
 
 
 
-module.exports = {addComment,getAllComments,deleteComment} 
+module.exports = {addComment,getAllComments,deleteComment}  

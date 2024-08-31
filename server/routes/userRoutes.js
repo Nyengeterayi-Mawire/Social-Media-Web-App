@@ -21,7 +21,6 @@ router.post('/login',auth,login);
 router.get('/:id',tokenVerify,auth,getUser);  
 router.get('/',tokenVerify,auth,getAllUsers);
 router.post('/',auth,createUser); 
-// router.patch('/:id',auth,updateUser);  
 router.patch('/add/:id',tokenVerify,auth,addFollower); 
 router.patch('/remove/:id',tokenVerify,auth,removeFollower);
 router.patch('/addcontact/:id',tokenVerify,auth,addMessageContact);

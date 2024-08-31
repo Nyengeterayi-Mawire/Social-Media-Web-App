@@ -1,56 +1,64 @@
 const Message = require('../schemas/messageSchema'); 
 const Conversation = require('../schemas/conversation');
 const User = require('../schemas/userSchema');
-
-
+const mongoose = require('mongoose');
+const {ObjectId} = mongoose.Types
 
 const sendMessage = async(req,res) => {
     try{ 
         const {senderID,receiverID,messageText,date,time} = req.body; 
         const {id} = req.params;  
-        console.log(typeof(id))
+        //No conversation exists 
         if(id==='0'){
+            //create conversation
             const createdConversation = await Conversation.create({firstuser:senderID,seconduser:receiverID}); 
             if (!createdConversation){
                 return res.json({err: ' Failed to create conversation'})
             } 
-            const message = await Message.create({conversationID:createdConversation._id,senderID,receiverID,message:messageText,date,time}) 
+            //create message
+            const message = await Message.create({conversationID:createdConversation._id,senderID,receiverID,message:messageText,date,time});
+            if(!message){
+                res.json({err:'could not create message'})
+            } 
+            //Find sender
             const sender = await User.findById(senderID);
             if(!sender){
                 res.json({err:'could not find user'})
             }
+            //Check if receiver already exists in senders contacts
             const checkSenderMessagingList = sender.messaging.filter(id=>id === receiverID) 
             if (!checkSenderMessagingList) {
                 const senderAddMessagingList = await User.findByIdAndUpdate(senderID,{$push:{messaging:receiverID}})
-                // return res.json(senderAddMessagingList)
             } 
-
+            //Find receiver
             const receiver = await User.findById(receiverID)
             if(!receiver){
                 res.json({err:'could not find user'})
             }
+            //Check if sender already exists in receivers contacts
             const checkReceiverMessagingList = receiver.messaging.filter(id=>id === senderID)[0] 
-            console.log('333',checkSenderMessagingList)
             if (!checkReceiverMessagingList) {
+                //Add sender to receivers contacts
                 const receiverAddMessagingList = await User.findByIdAndUpdate(receiverID,{$push:{messaging:senderID}}) 
                 console.log('444',receiverAddMessagingList)
                 // return res.json(receiverAddMessagingList)
             } 
             return res.status(200).json(message);
         }
+        //If there is a conversation that already exists
         const conversation  = await Conversation.findById(id);
-        console.log('id',conversation) 
-        if(!conversation){
-            const createdConversation = await Conversation.create({firstuser:senderID,seconduser:receiverID}); 
-            if (!createdConversation){
-                return res.json({err: ' Failed to create conversation'})
-            } 
-            const message = await Message.create({conversationID:createdConversation._id,senderID,receiverID,message:messageText,date,time}) 
-            console.log('3',message)
-            return res.status(200).json(message);
-        } 
+        // if(!conversation){
+        //     const createdConversation = await Conversation.create({firstuser:senderID,seconduser:receiverID}); 
+        //     if (!createdConversation){
+        //         return res.json({err: ' Failed to create conversation'})
+        //     } 
+        //     const message = await Message.create({conversationID:createdConversation._id,senderID,receiverID,message:messageText,date,time}) 
+        //     console.log('3',message)
+        //     return res.status(200).json(message);
+        // } 
+
+        //Create message and add to contacts
         const message = await Message.create({conversationID:conversation._id,senderID,receiverID,message:messageText,date,time}) 
-        console.log('created message',message)
         const sender = await User.findById(senderID);
         if(!sender){
             res.json({err:'could not find user'})
@@ -58,19 +66,23 @@ const sendMessage = async(req,res) => {
         const checkSenderMessagingList = sender.messaging.filter(id=>id === receiverID) 
         if (!checkSenderMessagingList) {
             const senderAddMessagingList = await User.findByIdAndUpdate(senderID,{$push:{messaging:receiverID}})
-            return res.json(senderAddMessagingList)
+            if(!senderAddMessagingList){
+                return res.json({err:'could not add receiver to contacts'})
+            }
+            // return res.json(senderAddMessagingList)
         } 
 
         const receiver = await User.findById(receiverID)
         if(!receiver){
-            res.json({err:'could not find user'})
+            return res.json({err:'could not find user'})
         }
         const checkReceiverMessagingList = receiver.messaging.filter(id=>id === senderID) 
-        console.log('111',checkSenderMessagingList)
         if (!checkReceiverMessagingList) {
             const receiverAddMessagingList = await User.findByIdAndUpdate(receiverID,{$push:{messaging:senderID}}) 
-            console.log('222',receiverAddMessagingList)
-            return res.json(receiverAddMessagingList)
+            if(!receiverAddMessagingList){
+                return res.json({err:'could not add sender to contacts'})
+            }
+            // return res.json(receiverAddMessagingList)
         } 
 
         return res.status(200).json(message);
@@ -79,6 +91,7 @@ const sendMessage = async(req,res) => {
     }
 }
 
+//Deelete message controller
 const deleteMessage = async(req,res) => {
     try{
         const {id} = req.params; 
@@ -92,42 +105,34 @@ const deleteMessage = async(req,res) => {
     }
 }  
 
+//Find conversation controller
 const findConversation = async(req,res) => {
     try{
         const {userLoggedIn,contactToMessage} = req.body;  
-        console.log('userlogged in',userLoggedIn,'- contact',contactToMessage) 
-        // const consversationList = Conversation.find({}); 
-        // if(!consversationList) {
-        //     return res.json({mssg : 'There are no conversations in database'})
-        // }
+        //Check for current users conversations in firstuser field and filter results to search for conversation with 
+        //contact in the seconduser field
         const conversationFirstUser = await Conversation.find({firstuser:userLoggedIn});
-        console.log('000',conversationFirstUser) 
-        if (conversationFirstUser.length === 0){
-            console.log('entered first loop')
-            const conversationSecondUser = await Conversation.find({seconduser:userLoggedIn});
-            
-            if (conversationSecondUser.length === 0){
-                console.log('entered second loop')
-                return res.json({})             
-            }  
-            console.log('converstaion list second',conversationSecondUser)
-            const checkContactToMessage = conversationSecondUser.filter(conversation=>conversation.firstuser === contactToMessage)
-            return res.status(200).json(checkContactToMessage[0])
-            
-        } 
-        // console.log('converstaion list first',conversationFirstUSer) 
-        const conversationWithContact = conversationFirstUser.filter(conversation=>conversation.seconduser === contactToMessage)
-        console.log('converstaion with contact',conversationWithContact)  
-        if(conversationWithContact.length === 0){
-            return res.json({})
-        }
-
-        res.status(200).json(conversationWithContact[0])
+        const first = conversationFirstUser.filter(convo => convo.seconduser.equals(contactToMessage));
+        if(first.length != 0){
+            console.log('aaa',first);
+           return res.status(200).json(first[0]);
+        }       
+        //Check for current users conversations in seconduser field and filter results to search for conversation with 
+        //contact in the firstuse field
+        const conversationSecondtUser = await Conversation.find({seconduser:userLoggedIn}); 
+        const second = conversationSecondtUser.filter(convo => convo.firstuser.equals(contactToMessage));
+        if(second.length === 0){
+            //No conversation with both id as firstuser or seconduser
+            return res.status(200).json({})
+        }         
+        res.status(200).json(second[0]);
+        
     }catch(err){
         res.json({err:err.message})
     }
 } 
 
+//Get all messages for a singular conversation
 const getMessages = async(req,res) => {
     try{
         const {id} = req.params; 
